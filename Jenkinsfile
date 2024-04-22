@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+   Docker 'Docker'
+}
     
     environment {
         DOCKER_IMAGE_NAME = 'my-jenkins-image'
