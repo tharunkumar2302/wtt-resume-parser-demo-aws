@@ -46,3 +46,4 @@ nohup python3 flask_api.py .env_dev &
 sudo lsof -i :5000
 sudo kill <PID>
 
+# wtt-resume-parser-demo-aws
