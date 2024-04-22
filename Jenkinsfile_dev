@@ -1,0 +1,81 @@
+pipeline {
+    agent {
+        node {
+            label 'wttslave'
+        }
+    }
+
+environment {
+        PYTHON_VERSION = '3'
+    }
+   
+parameters {
+  choice choices: ['DEV','BACKUP','INIT'], name: 'ENVIRONMENT'
+  string defaultValue: 'develop', name: 'BRANCH'
+}
+
+    stages {
+        stage('CheckOut') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('DEV'){when {
+                expression { 
+                   return params.ENVIRONMENT == 'DEV'
+                }
+            }
+            steps{
+                sh "cd /home/walkingtree/jenkins/workspace/wtt-resume-parser-pms-dev && rm -rf .venv"
+            }
+        }
+        stage('INIT') {
+            when {
+                expression { 
+                   return params.ENVIRONMENT == 'INIT'
+                }
+            }
+            steps {
+                    sshagent(credentials : ['a5a073bd-e907-40b4-8a9a-b792391369e4']) {
+                        sh "cd /home/walkingtree/jenkins/workspace/wtt-resume-parser-pms-dev && rm -rf .venv"
+                        sh "ssh -o StrictHostKeyChecking=no rms-uat@192.168.1.94 'uptime && cd .. && ls && cd rms-uat/pms_uat_server && rm -rf wtt-resume-parser-pms-dev'"
+                        sh "scp -r -o StrictHostKeyChecking=no $WORKSPACE rms-uat@192.168.1.94:/home/rms-uat/pms_uat_server"
+                        sh "ssh -o StrictHostKeyChecking=no rms-uat@192.168.1.94 'cd .. && ls && cd rms-uat/pms_uat_server/wtt-resume-parser-pms-dev/pms && python${PYTHON_VERSION} -m venv ../../.venv && source ../../.venv/bin/activate && pip install --upgrade pip  && pip install pip==20.0.2 && echo \'ADMIN\' | sudo -S apt-get  update -y && echo \'ADMIN\' | sudo -S apt-get  install -y  python3 libpoppler-cpp-dev libpoppler-dev cmake libgl1-mesa-glx libsm6 libxext6 libgl1 libglib2.0-0 python3-opencv python-dev-is-python2 libxml2-dev libxslt1-dev antiword unrtf poppler-utils pstotext tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3 sox libjpeg-dev swig libpulse-dev python3-opencv libglib2.0-0 libgl1 libxext6 libsm6 libgl1-mesa-glx python3-tk ghostscript python-setuptools  && echo \'ADMIN\' | sudo -S apt-get  install -y sudo && echo \'ADMIN\' | sudo -S apt-get install python3-pip -y && ../../.venv/bin/pip install -r requirements.txt  && ../../.venv/bin/python -m pip install boto3 && ../../.venv/bin/pip install --no-cache-dir pdfminer.six && ../../.venv/bin/pip install spacy && ../../.venv/bin/python3 -m spacy download en_core_web_sm'"
+
+                }
+                }
+              }
+
+        stage('Deploy to DEV') {
+            when {
+                expression { 
+                   return params.ENVIRONMENT == 'DEV'
+                }
+            }
+            steps {
+                    sshagent(credentials : ['a5a073bd-e907-40b4-8a9a-b792391369e4']) {
+                        sh "ssh -o StrictHostKeyChecking=no rms-uat@192.168.1.94 'uptime && cd .. && ls && cd rms-uat/pms_uat_server && mkdir python_script_backup;today=\$(date +%d-%m-%Y) && rm -rf python_script_backup/\"\$today\"  && rm -rf wtt-resume-parser-pms-dev'"
+                        sh "scp -r -o StrictHostKeyChecking=no /home/walkingtree/jenkins/workspace/wtt-resume-parser-pms-dev/ rms-uat@192.168.1.94:/home/rms-uat/pms_uat_server"
+                        sh "ssh -o StrictHostKeyChecking=no rms-uat@192.168.1.94 'cd .. && ls && cd rms-uat/pms_uat_server/wtt-resume-parser-pms-dev/pms && source ../../.venv/bin/activate'"
+                   
+                }
+                }
+            
+        }
+
+        stage('starting script in DEV') {
+            when {
+                expression { 
+                   return params.ENVIRONMENT == 'DEV'
+                }
+            }
+            steps {
+                    sshagent(credentials : ['a5a073bd-e907-40b4-8a9a-b792391369e4']) {
+                        sh "ssh -o StrictHostKeyChecking=no rms-uat@192.168.1.94 'cd .. && ls && cd rms-uat/pms_uat_server/wtt-resume-parser-pms-dev/pms && source ../../.venv/bin/activate'"
+                   
+                }
+                }
+            
+        }   
+    }
+}
