@@ -17,7 +17,7 @@ RUN python3 -m venv .venv \
 
 # Install packages and clean up
 RUN pip install --no-cache-dir flask werkzeug pinecone-client openai schedule wget textract common dual tight data prox groq \
-    && pip install --no-cache-dir -r requirements_aws_py3_10.txt \
+    && pip install --no-cache-dir -r pms/requirements_aws_py3_10.txt \
     && find /usr/local/lib/python3.11 -name '__pycache__' -exec rm -rf {} + \
     && find /usr/local/lib/python3.11 -name '*.pyc' -delete
 
