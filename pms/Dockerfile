@@ -1,4 +1,4 @@
-FROM python:3.11.0-slim-buster
+FROM python:3.11.0-slim
 
 WORKDIR /app
 
@@ -25,7 +25,9 @@ RUN pip install --no-cache-dir flask werkzeug pinecone-client openai schedule wg
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 EXPOSE 5000
-CMD ["nohup", "python3", "flask_api.py", ".env_demo", "&"]
+
+CMD ["python3", "flask_api.py", ".env_demo"]
+
 
 
 
