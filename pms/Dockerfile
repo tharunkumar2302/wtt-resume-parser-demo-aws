@@ -2,7 +2,7 @@ FROM python:3.11.0-slim
 
 WORKDIR /app
 
-COPY /pms /app
+COPY . /app
 
 # Install necessary build tools
 RUN apt-get update \
