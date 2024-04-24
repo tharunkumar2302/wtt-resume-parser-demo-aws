@@ -1,7 +1,7 @@
 FROM python:3.11.0-slim
 
 WORKDIR /app
-COPY flask_api.py /app
+COPY pms/flask_api.py /app
 COPY . /app
 
 # Install necessary build tools
