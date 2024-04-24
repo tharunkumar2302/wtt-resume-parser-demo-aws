@@ -1,8 +1,8 @@
 FROM python:3.11.0-slim
 
 WORKDIR /app
-COPY . /app
-COPY pms/flask_api.py /app
+COPY /pms /app
+
 
 # Install necessary build tools
 RUN apt-get update \
