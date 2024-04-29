@@ -1,7 +1,7 @@
 FROM python:3.11.0-slim
 
 WORKDIR /app
-COPY /pms /app
+COPY wtt-resume-parser/pms/ /app
 
 
 # Install necessary build tools
